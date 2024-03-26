@@ -1,11 +1,15 @@
 # Overview
 
+## Objective
+
 SRE stands for Streaming Render Engine, a rendering engine that is heavily inspired by the REYES rendering engine, with the following design goals:
 
 * Support images of arbitrary resolution.
 * Support arbitrarily large amounts of scene-level geometry.
 * Support arbitrarily large numbers of rendering processes.
 * Support transparency, depth of field, spatial anti-aliasing, motion blur, and focal blur.
+
+
 
 Rendering takes place in several stages, each of which is accomplished by a separate executable, using piping to transfer data from one stage to the next.
 
@@ -21,14 +25,28 @@ The primitive renderer is responsible for taking input in the form of shaders an
 
 The render hit coallator receives a stream of render hits and composites them into images.
 
+# Project road map
+
+The project is currently focused on developing the render hit coallator, which is the final rendering stage.
+
 # Inter-process data
 
-* Primitives. The primitive rendering stage receives a text stream which defines one or more primitives and shaders, and from this generates the pixel data for the final image. The following types of data are envisioned:
-
-  * Bezier patches. These are defined in two spatial dimensions and one temporal dimension (to support moton blur).
-  * Shaders. These are functions which define the texturing at every point of a surface.
-
 * Render hits. This is a rendered sample of framebuffer data. It contains the horizontal and vertical coordinates of the pixel within the frame, the sub-pixel within the pixel (to support all three forms of anti-aliasing), the depth (to properly support occlusion), and channel data (to specify the desired color and other output data).
+
+* A render hit stream consists of:
+  * An integer for the horizontal coordinate of the pixel;
+  * An integer for the vertical coordinate of the pixel;
+  * An integer for the sub-pixel within the pixel;
+  * A float value for the depth of the data;
+  * One or more channel data, separated by a comma;
+  * A semicolon to terminate the render hit.
+
+* A channel datum consists of:
+  * A string for the name of the channel;
+  * A float value for the channel;
+  * An optional alpha value (default is 1.0);
+  * An optional spread value (default is 0.0);
+  * A comma, if this is not the final channel datum in the render hit.
 
 # More detail
 
