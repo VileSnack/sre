@@ -11,15 +11,11 @@ Rendering takes place in several stages, each of which is accomplished by a sepa
 
 # Scene generation
 
-The scene generation stage will create the renderable primitives. The input to this process can come from an automated scene generation tool, or from a scene file created by a user employing GUI tools, or any other set of tools. The output of these tools will consist of Bezier patches, Particle fields, and shaders:
-
-* Bezier patches define a two-dimensional surface. The definition of the patch can contain a temporal parameter for animation.
-* Bezier volumes define a three-dimensional space in which particles are distributed.
-* Shaders define the texture properties of the geometric primitives.
+Scene generation begins with 3D authoring tools of some kind, whether it be a 3D modelling application or a scripting language. The output from the scene generation stage consists of primitives to be rendered and shaders to define the qualities of each primitive at every point.
 
 # Primitive rendering
 
-The primitive renderer is responsible for taking input in the form of shaders, Bezier patches, and Bezier volumes, and from them generating render hits, which are a sample of texture data appearing at a specific place in the viewing frame.
+The primitive renderer is responsible for taking input in the form of shaders and primitives, and from these generating *render hits*.
 
 # Render hit coallation
 
@@ -27,6 +23,21 @@ The render hit coallator receives a stream of render hits and composites them in
 
 # Inter-process data
 
-  # Bezier patches
+* Primitives. The primitive rendering stage receives a text stream which defines one or more primitives and shaders, and from this generates the pixel data for the final image. The following types of data are envisioned:
 
-  Bezier patches
+  * Bezier patches. These are defined in two spatial dimensions and one temporal dimension (to support moton blur).
+  * Shaders. These are functions which define the texturing at every point of a surface.
+
+* Render hits. This is a rendered sample of framebuffer data. It contains the horizontal and vertical coordinates of the pixel within the frame, the sub-pixel within the pixel (to support all three forms of anti-aliasing), the depth (to properly support occlusion), and channel data (to specify the desired color and other output data).
+
+# More detail
+
+When the primitive renderer reads a shader from its input stream, it sets this shader as the current shader for all subsequent patches.
+
+Bezier patches are read from the input stream, and are defined by a three-dimensional array of coefficients. The patch is initially assigned a five-dimensional bounding volume from <0,0,0,-1,-1> to <1,1,1,1,1>, where the first element is the time within the frame, the second and third elements are the spatial parameters of the patch, and the final two parameters are used for depth of field. The corners of this bounding volume are projected against the framebuffer, and recursively subdivided and re-projected, until each child patch is either entirely outside of the viewing frame or spans over two pixels or less in both directions. These final sub-patches are tested against the sub-pixels within their projected area. If a test passes, the current shader is called for the patch location and the results of the shader are output as a render hit. 
+
+The render coallator accepts a stream of render hits and appends each hit to a raster line file based on the vertical coordinate of the render hit's pixel. This allows scene geometry to be rendered in any order without regard to its location in the framebuffer, and also supports an amount of scene geometry limited only by the amount of available storage space.
+
+When the end of the stream of render hits is reached, the coallator then takes each raster file and separates each render hit by pixel and sub-pixel.
+
+Each sub-pixel's render hits are sorted by depth, and then the color data of each render hit is applied in furthest-to-nearest order, to support transparency. When each sub-pixel's channel data is calculated, the channels are averaged together to produce the channel data for the pixel, which is written to the output file.
