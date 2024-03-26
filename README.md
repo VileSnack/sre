@@ -84,6 +84,6 @@ In the stream expected by the image fragment coallator:
 
 If an object with a surface color (.875,.5,.25,.9), giving a slightly transparent caramel color, covers sub-pixel #13 of the pixel at (123,45), at a distance of 3.4534 units from the camera viewpoint, the image fragment stream would look like this:
 
-123 45 12 3.4534 R .875 1.00 .9, G .500 .9, B .25 .9;
+123 45 12 3.4534 R .875 .9, G .500 .9, B .25 .9;
 
 Note that the channel data does not have to be color and transparency data; the channel can also specify highlighting, surface normals, the coordinates of a mapped texture, or any other set of values.
