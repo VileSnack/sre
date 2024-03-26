@@ -2,7 +2,7 @@
 
 ## History
 
-I started this project several years ago, after a couple decades of using the Persistence of Vision Ray Tracer (www.povray.org), which is a freeware 3d rendering application running on scripting files, and coming across a paper at graphics.pixar.com which described the REYES paradigm. I took some of the ideas from the REYES papers, some more ideas from POV-Ray, and came up with a rendering strategy of my own.
+I started this project some years ago, after a couple decades of using the Persistence of Vision Ray Tracer (www.povray.org), which is a freeware 3d rendering application running on scripting files, and coming across a paper at graphics.pixar.com which described the REYES paradigm. I took some of the ideas from the REYES papers, some more ideas from POV-Ray, and came up with a rendering strategy of my own.
 
 ## Goals
 
@@ -14,12 +14,12 @@ The POV-Ray renderer is an excellent tool for a hobbyist who has lots of time bu
 
 REYES rendering overcomes some of these limitations, but it also has limitations of its own:
 
-* All rendered imagery has to be retained in memory until rendering is complete.
+* Supporting full transparency requires a degree of rendered imagery to be retained in memory until rendering is complete.
 * Some scene geometry has to be retained in memory when it is not being rendered.
 
 My hope is to address all of the above weaknesses, and accomplish the following as well:
 
-* Support images of arbitrary resolution. To be ready when 16K monitors are all the rage.
+* Support images of arbitrary resolution. (To be ready when 16K monitors are all the rage.)
 * Support arbitrarily large amounts of scene-level geometry. We should be able to render a forest and all of its leaves.
 * Support arbitrarily large numbers of independent rendering processes. This allows large rendering jobs to be split up among separate processes.
 * Support transparency, depth of field, spatial anti-aliasing, motion blur, and focal blur. These are necessary for most animation work.
@@ -46,7 +46,7 @@ Both of these approaches require each primitive to occupy memory while some othe
 
 By allowing scene geometry to be rendered in any order, each piece of scene geometry needs to be in memory only while it is being rendered. This allows for more complicated primitives to be rendered.
 
-Also, because the individual fragments can be generated in any order, rendering of a single scene can be divided up among multiple independent processors, with their results marged at the final stage. This allows for more efficient management of rendering operations.
+Also, because the individual fragments can be generated in any order, rendering of a single scene can be divided up among multiple independent processors, with their results merged at the final stage. This allows for more efficient management of rendering operations.
 
 Another advantage of this approach is that a pass-through utility can be used to monitor the progress of a scene file; by reading each image fragment, applying it to the image in a display monitor, and then piping that same fragment to the coallation stage, render management personnel can observe the progress of rendering in real time.
 
@@ -82,8 +82,8 @@ In the stream expected by the image fragment coallator:
 * Image fragments are delimited by semicolons. The final image fragment can end with an end-of-file.
 * Channel data entries are delimited by commas; the final channel datum in an image fragment can share that fragment's semicolon/EOF terminator. Also, the alpha and spread values default to 1 and 0 respectively.
 
-If sub-pixel #12 in pixel 123,45 is to be colored with red, green, blue, and alpha values of (.875,.5,.25,.9), giving a slightly transparent caramel color, the image fragment stream would look like this:
+If an object with a surface color (.875,.5,.25,.9), giving a slightly transparent caramel color, covers sub-pixel #13 of the pixel at (123,45), at a distance of 3.4534 units from the camera viewpoint, the image fragment stream would look like this:
 
 123 45 12 3.4534 R .875 1.00 .9, G .500 .9, B .25 .9;
 
-
+Note that the channel data does not have to be color and transparency data; the channel can also specify highlighting, surface normals, the coordinates of a mapped texture, or any other set of values.
