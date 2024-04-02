@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <direct.h>
 #include "Buffer.h"
 
 const char* FILE_PATT = "row%d.txt";
@@ -18,8 +19,42 @@ int main(int argc, char** argv)
 	FILE* rowFile = NULL;
 	struct Buffer buffer;
 	int lastRow = -1;
+	int err = 0;
 
 	// If we ever need to, have a look at the command-line arguments here.
+	if (0 < argc)
+	{
+		err = _chdir(argv[1]);
+
+		if (0 != err)
+		{
+			switch (errno)
+			{
+				case 2:	// the selected directory does not exist.
+					if (0 == _mkdir(argv[1]))
+					{
+						err = _chdir(argv[1]);
+					}
+					else
+					{
+						fprintf(stderr
+							, "***** Error: Directory '%s' does not exist, creation attempt returned error code %d.\n"
+							, argv[1]
+							, errno
+						);
+						exit(-1);
+					}
+				break;
+				default:
+					fprintf(stderr
+						, "***** Error: Change directory attempt returned %d.\n"
+						, errno
+					);
+					exit(-1);
+				break;
+			}
+		}
+	}
 
 	InitBuffer(&buffer);
 
