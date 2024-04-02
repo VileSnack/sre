@@ -2,7 +2,7 @@
 
 ## History
 
-I started this project some years ago, after a couple decades of using the Persistence of Vision Ray Tracer (www.povray.org), which is a freeware 3d rendering application running on scripting files, and coming across a paper at graphics.pixar.com which described the REYES paradigm. I took some of the ideas from the REYES papers, some more ideas from POV-Ray, and came up with a rendering strategy of my own.
+I started this project some years ago, after a couple decades of using the Persistence of Vision Ray Tracer (www.povray.org), which is a freeware 3d rendering application running on scripting files, and coming across a paper at graphics.pixar.com which described the REYES method. I took some of the ideas from the REYES papers, some more ideas from POV-Ray, and came up with a rendering strategy of my own.
 
 ## Goals
 
@@ -68,8 +68,8 @@ Each channel datum is a record of data that describes the value of an image elem
 
 * The name of the channel;
 * The value;
-* The alpha value (defaults to 1.0);
-* The spread value (defaults to 0.0).
+* The alpha value (defaults to `1.0`);
+* The spread value (defaults to `0.0`).
 
 The alpha value determines how much of the deeper scenery is visible.
 
@@ -84,9 +84,9 @@ In the stream expected by the image fragment coallator:
 
 If an object with a surface color (.875,.5,.25,.9), giving a slightly transparent caramel color, covers sub-pixel #13 of the pixel at (123,45), at a distance of 3.4534 units from the camera viewpoint, the image fragment stream would look like this:
 
-123 45 12 3.4534 R .875 .9, G .500 .9, B .25 .9;
+`123 45 12 3.4534 R .875 .9, G .500 .9, B .25 .9;`
 
-Note that the channel data does not have to be color and transparency data; the channel can also specify highlighting, surface normals, the coordinates of a mapped texture, or any other set of values.
+Note that the channel data does not have to represent color and transparency data; the channel can also specify highlighting, surface normals, the coordinates of a mapped texture, or any other set of values. This can be used to allow many lighting and environmental effects to be applied at a later stage of processing.
 
 ## ifc
 
