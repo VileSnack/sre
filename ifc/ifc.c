@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
 // ifc.c
 // 
-// Implements the 'main' function.
+// Implements the main function.
 //
 #include <stdbool.h>
 #include <stdio.h>
@@ -21,7 +21,9 @@ int main(int argc, char** argv)
 	int lastRow = -1;
 	int err = 0;
 
-	// If we ever need to, have a look at the command-line arguments here.
+	//--------------------------------------------------------------------------
+	// At the moment this utility accepts only one command-line argument.
+	//
 	if (0 < argc)
 	{
 		err = _chdir(argv[1]);

@@ -21,7 +21,7 @@ My hope is to address all of the above weaknesses, and accomplish the following 
 
 * Support images of arbitrary resolution. (To be ready when 16K monitors are all the rage.)
 * Support arbitrarily large amounts of scene-level geometry. We should be able to render a forest and all of its leaves.
-* Support arbitrarily large numbers of independent rendering processes. This allows large rendering jobs to be split up among separate processes.
+* Support arbitrarily large numbers of independent rendering processes. This allows large rendering jobs to be split up among separate processes. Among other things, this allows old hardware to remain useful.
 * Support transparency, depth of field, spatial anti-aliasing, motion blur, and focal blur. These are necessary for most animation work.
 
 ## Modular rendering process.
@@ -40,15 +40,15 @@ This is going to be a separate executable so that it can be used for other rende
 
 # Image Fragment Coallation
 
-The idea behind image fragment coallation is to free the previous rendering stages from a forced ordering of rendering. Ray tracers work on a pixel-by-pixel basis, usually starting with the top-most raster line, rendering the pixels on that line from left to right, and then working downward from there. The REYES method also imposes a spatial re-ordering of scene geometry (each primitive is assigned to one or more "buckets", with each bucket then being rendered in order).
+One limitation of both ray-tracing and REYES rendering is that they both have a requirement to keep some rendered imagery and some scene geometry in memory, including imagery and geometry which is not involved in the rendering that is ongoing. This increases the memory requirements for the processor. This partly due to the strategy of rendering an image starting from one part of the image and progressing to the other.
 
-Both of these approaches require each primitive to occupy memory while some other primitive is being rendered, and although the REYES scheme at least allows primitives in completed buckets to be released, primitives in unrendered buckets still occupy memory.
+The solution used by the SRE is to save rendered geometry to file as it is rendered, so that there is no need to retain it in memory This frees the renderer from the need to render scene geometry in any particular order, which in turn frees the renderer from needing to retain scene geometry in memory when it is not being rendered.
 
-By allowing scene geometry to be rendered in any order, each piece of scene geometry needs to be in memory only while it is being rendered. This allows for more complicated primitives to be rendered.
+This is accomplished by including the fragment's location in the final raster image with the fragment, and saving each image fragment to file. Once all rendering has been accomplished, the files containing the fragment data can be processed to generate the final image.
 
-Also, because the individual fragments can be generated in any order, rendering of a single scene can be divided up among multiple independent processors, with their results merged at the final stage. This allows for more efficient management of rendering operations.
+This strategem also allows multiple processors to render scene geometry for the same image, without interfering with each other.
 
-Another advantage of this approach is that a pass-through utility can be used to monitor the progress of a scene file; by reading each image fragment, applying it to the image in a display monitor, and then piping that same fragment to the coallation stage, render management personnel can observe the progress of rendering in real time.
+Another advantage of this approach is that a pass-through utility can be used to monitor the progress of a render; by reading each image fragment, applying it to the image in a display monitor, and then piping that same fragment to the coallation stage, render management personnel can observe the progress of rendering in real time.
 
 The trade-off for this is that the image fragments must be stored before they can be coallated into the final image. However, this data can be stored in files, and not in computer memory.
 
@@ -87,3 +87,11 @@ If an object with a surface color (.875,.5,.25,.9), giving a slightly transparen
 123 45 12 3.4534 R .875 .9, G .500 .9, B .25 .9;
 
 Note that the channel data does not have to be color and transparency data; the channel can also specify highlighting, surface normals, the coordinates of a mapped texture, or any other set of values.
+
+## ifc
+
+The project `ifc` in this repository contains the source for the image fragment coallator, written in C.
+
+It receives its input from `stdin` and writes the image fragments to a set of files following the pattern `row%d.txt`.
+
+The output files by default are written to the working directory of the `ifc` process. This can be changed by supplying the name of another directory as the first command-line argument when executing the utility. The directory will be created if it does not already exist.
