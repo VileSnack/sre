@@ -92,6 +92,6 @@ Note that the channel data does not have to be color and transparency data; the 
 
 The project `ifc` in this repository contains the source for the image fragment coallator, written in C.
 
-It receives its input from `stdin` and writes the image fragments to a set of files following the pattern `row%d.txt`.
+It receives its input from `stdin` and writes the image fragments to a set of files following the pattern `row%d.txt`, where `%d` is the vertical coordinate of the fragment's pixel. Existing files are **not** overwritten, but instead are extended with new data.
 
 The output files by default are written to the working directory of the `ifc` process. This can be changed by supplying the name of another directory as the first command-line argument when executing the utility. The directory will be created if it does not already exist.
