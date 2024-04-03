@@ -30,15 +30,16 @@ Rendering will proceed in distinct stages:
 
 * Scene generation. This is the stage where the author creates the scene, using whatever authoring tools are available.
 * Primitive rendering. The renderer will take the data generated in the previous step and from it generate image fragments.
-* Image fragment coallation. The coallator will take the fragments generated in the previous step and from it generate an image file.
+* Image fragment collation. The collator will take the fragments generated in the previous step and group them for more efficient processing.
+* Image file generation. The generator will take each group of fragments (perhaps from different sources) and combine them into the final image.
 
 # Project road map
 
-The project is currently focused on developing the image fragment coallator, which is the final rendering stage.
+The image fragment collator is essentially done.
 
-This is going to be a separate executable so that it can be used for other rendering techniques. The primitive rendering stage described above need not be the only way to generate image fragments; a CAD program, or a ray-casting renderer, can generate image fragments. Also, making it a separate executable will enable it to be tested before the prior stages are developed.
+The image file generator is the next stage. Currently it is in the note-taking phase.
 
-# Image Fragment Coallation
+# Image Fragment Collation
 
 One limitation of both ray-tracing and REYES rendering is that they both have a requirement to keep some rendered imagery and some scene geometry in memory, including imagery and geometry which is not involved in the rendering that is ongoing. This increases the memory requirements for the processor. This partly due to the strategy of rendering an image starting from one part of the image and progressing to the other.
 
@@ -48,9 +49,9 @@ This is accomplished by including the fragment's location in the final raster im
 
 This strategem also allows multiple processors to render scene geometry for the same image, without interfering with each other.
 
-Another advantage of this approach is that a pass-through utility can be used to monitor the progress of a render; by reading each image fragment, applying it to the image in a display monitor, and then piping that same fragment to the coallation stage, render management personnel can observe the progress of rendering in real time.
+Another advantage of this approach is that a pass-through utility can be used to monitor the progress of a render; by reading each image fragment, applying it to the image in a display monitor, and then piping that same fragment to the collation stage, render management personnel can observe the progress of rendering in real time.
 
-The trade-off for this is that the image fragments must be stored before they can be coallated into the final image. However, this data can be stored in files, and not in computer memory.
+The trade-off for this is that the image fragments must be stored before they can be collated into the final image. However, this data can be stored in files, and not in computer memory.
 
 Another trade-off is that scene data will have to be built into the shader so that shadows and reflections can be accurately calculated, and will have to be coded to account for the motions of all scene obects (light sources and shadow-casting geometry).
 
@@ -77,7 +78,7 @@ The spread value is used to distribute the effect of the value and alpha over a 
 
 (Note that the alpha value is optional only if the spread value is left out as well.)
 
-In the stream expected by the image fragment coallator:
+In the stream expected by the image fragment collator:
 
 * Image fragments are delimited by semicolons. The final image fragment can end with an end-of-file.
 * Channel data entries are delimited by commas; the final channel datum in an image fragment can share that fragment's semicolon/EOF terminator. Also, the alpha and spread values default to 1 and 0 respectively.
@@ -90,8 +91,20 @@ Note that the channel data does not have to represent color and transparency dat
 
 ## ifc
 
-The project `ifc` in this repository contains the source for the image fragment coallator, written in C.
+The project `ifc` in this repository contains the source for the image fragment collator, written in C.
 
-It receives its input from `stdin` and writes the image fragments to a set of files following the pattern `row%d.txt`, where `%d` is the vertical coordinate of the fragment's pixel. Existing files are **not** overwritten, but instead are extended with new data.
+Its operation is very simple: It receives a stream of image fragments via `stdin` and writes each fragment to a file selected based on the vertical coordinate of the fragment's pixel. Existing files are **not** overwritten, but instead are extended with new data.
 
 The output files by default are written to the working directory of the `ifc` process. This can be changed by supplying the name of another directory as the first command-line argument when executing the utility. The directory will be created if it does not already exist.
+
+## ifg
+
+The image file generator will be the final stage of rendering. It will take a set of files containing image fragment data and from them generate a final image file.
+
+The current concept supports the following command-line options:
+
+* Output file type. I will probably support PNG files (and possibly make them the default type).
+
+* Output file name.
+
+* Additional input directories (to support combining fragment data from multiple renderers).
