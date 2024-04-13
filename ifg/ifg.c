@@ -1,15 +1,22 @@
 ﻿//------------------------------------------------------------------------------
 // ifg.cpp : Defines the entry point for the application.
 //
+#include <limits.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include "funcs.h"
+
+int xMin = INT_MAX;
+int xMax = INT_MIN;
+int yMin = INT_MAX;
+int yMax = INT_MIN;
+int samplingLevel = 1;
 
 int main(int argc, char** argv)
 {
-	int index;
-
-	for (index = 1; index < argc; index++)
+	if (!ParseCommandLine(argc, argv))
 	{
-		printf("Command line option #%d: '%s'\n", index, argv[index]);
+		exit(-1);
 	}
 
 	return 0;
