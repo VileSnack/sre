@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
 // ifc.c
 // 
-// Implements the main function.
+// Implements the main function for the image fragment collator.
 //
 #include <stdbool.h>
 #include <stdio.h>

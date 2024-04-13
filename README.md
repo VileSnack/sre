@@ -24,13 +24,13 @@ My hope is to address all of the above weaknesses, and accomplish the following 
 * Support arbitrarily large numbers of independent rendering processes. This allows large rendering jobs to be split up among separate processes. Among other things, this allows old hardware to remain useful.
 * Support transparency, depth of field, spatial anti-aliasing, motion blur, and focal blur. These are necessary for most animation work.
 
-## Modular rendering process.
+## Modular rendering
 
-Rendering will proceed in distinct stages:
+Rendering will be handled by separate executables, which will either pipe output to the following stage, or write output to file, from which the following stage will read:
 
 * Scene generation. This is the stage where the author creates the scene, using whatever authoring tools are available.
 * Primitive rendering. The renderer will take the data generated in the previous step and from it generate image fragments.
-* Image fragment collation. The collator will take the fragments generated in the previous step and group them for more efficient processing.
+* Image fragment collation. The collator will take the image fragments generated in the previous step and group them for more efficient processing by the image file generator.
 * Image file generation. The generator will take each group of fragments (perhaps from different sources) and combine them into the final image.
 
 # Project road map
@@ -43,7 +43,7 @@ The image file generator is the next stage. Currently it is in the note-taking p
 
 One limitation of both ray-tracing and REYES rendering is that they both have a requirement to keep some rendered imagery and some scene geometry in memory, including imagery and geometry which is not involved in the rendering that is ongoing. This increases the memory requirements for the processor. This partly due to the strategy of rendering an image starting from one part of the image and progressing to the other.
 
-The solution used by the SRE is to save rendered geometry to file as it is rendered, so that there is no need to retain it in memory This frees the renderer from the need to render scene geometry in any particular order, which in turn frees the renderer from needing to retain scene geometry in memory when it is not being rendered.
+The solution used by the SRE is to save rendered imagery to file as it is generated, so that there is no need to retain it in memory. This frees the renderer from the need to render scene geometry in any particular order, which in turn frees the renderer from needing to retain scene geometry in memory when it is not being rendered.
 
 This is accomplished by including the fragment's location in the final raster image with the fragment, and saving each image fragment to file. Once all rendering has been accomplished, the files containing the fragment data can be processed to generate the final image.
 
@@ -51,7 +51,7 @@ This strategem also allows multiple processors to render scene geometry for the 
 
 Another advantage of this approach is that a pass-through utility can be used to monitor the progress of a render; by reading each image fragment, applying it to the image in a display monitor, and then piping that same fragment to the collation stage, render management personnel can observe the progress of rendering in real time.
 
-The trade-off for this is that the image fragments must be stored before they can be collated into the final image. However, this data can be stored in files, and not in computer memory.
+The trade-off for this is that the image fragments must be stored before they can be collated into the final image. However, this data can be stored in files, and not in computer memory; hard drive space is the very cheapest resource in IT.
 
 Another trade-off is that scene data will have to be built into the shader so that shadows and reflections can be accurately calculated, and will have to be coded to account for the motions of all scene obects (light sources and shadow-casting geometry).
 
@@ -99,12 +99,26 @@ The output files by default are written to the working directory of the `ifc` pr
 
 ## ifg
 
-The image file generator will be the final stage of rendering. It will take a set of files containing image fragment data and from them generate a final image file.
+The project `ifg` in this repository contains the source for the image file generator, written in C.
+
+The image file generator is the final stage of rendering. It will take a set of files containing image fragment data and from them generate a final image file.
 
 The current concept supports the following command-line options:
 
-* Output file type. I will probably support PNG files (and possibly make them the default type).
+* `-of` Output file name. The output file type will be derived from the file extension. Will probably support PNG and EXR.
 
-* Output file name.
+* `-id` (short for *include directory*): Input directory to include. Can be repeated. This is to support rendering from multiple processors.
 
-* Additional input directories (to support combining fragment data from multiple renderers).
+* `-cd` (short for *consume directory*): Like `-id` except that the files are deleted as they are processed.
+
+* `-l` The x-coordinate of the left-most pixels to be processed. These pixels will be the left edge of the image file. Pixels with lower values will be ignored. Defaults to `0`.
+
+* `-t` The y-coordinate of the top row of pixels to be processed. These pixels will be the top edge of the image file. Pixels with lower values will be ignored. Defaults to `0`.
+
+* `-r` The x-coordinate of right-most pixels to be processed. These pixels will be the right edge of the image file. Pixels with higher values will be ignored.
+
+* `-b` The y-coordinate of the bottom row of pixels to be processed. These pixels will be the bottom edge of the image file. Pixels with higher values will be ignored.
+
+* `-w` The same as `-l 0 -r N-1` where `N` is the supplied value.
+
+* `-h` The same as '-t 0 -b N-1' where `N` is the supplied value.
