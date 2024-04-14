@@ -11,6 +11,7 @@ int xMax = INT_MIN;
 int yMin = INT_MAX;
 int yMax = INT_MIN;
 int samplingLevel = 1;
+char* outputFileName = NULL;
 
 int main(int argc, char** argv)
 {

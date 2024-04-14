@@ -12,6 +12,7 @@ extern int xMax;
 extern int yMin;
 extern int yMax;
 extern int samplingLevel;
+extern char* outputFileName;
 
 bool ParseCommandLine(int argc, char** argv)
 {
@@ -186,6 +187,11 @@ bool ParseCommandLine(int argc, char** argv)
 				return false;
 			}
 		}
+		else if (0 == strcmp("-f", argv[index]))
+		{
+			index++;
+			outputFileName = argv[index];
+		}
 	}
 
 	if (xMin > xMax)
@@ -198,6 +204,13 @@ bool ParseCommandLine(int argc, char** argv)
 	if (yMin > yMax)
 	{
 		fprintf(stderr, "***** Error: Both top and bottom rows must be set. Use the -t and -b options, or the -h option.\n");
+
+		return false;
+	}
+
+	if (NULL == outputFileName)
+	{
+		fprintf(stderr, "***** Error: An output file name must be set. Use the -f option to set the output file name.\n");
 
 		return false;
 	}

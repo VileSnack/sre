@@ -121,6 +121,6 @@ The current concept supports the following command-line options:
 
 * `-w` The same as `-l 0 -r N-1` where `N` is the supplied value.
 
-* `-h` The same as '-t 0 -b N-1' where `N` is the supplied value.
+* `-h` The same as `-t 0 -b N-1` where `N` is the supplied value.
 
 * `-a` (short for *anti-aliasing*) The sampling level per pixel.
