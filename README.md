@@ -105,11 +105,9 @@ The image file generator is the final stage of rendering. It will take a set of 
 
 The current concept supports the following command-line options:
 
-* `-of` Output file name. The output file type will be derived from the file extension. Will probably support PNG and EXR.
+* `-f` Output file name. The output file type will be derived from the file extension. Will probably support PNG and EXR.
 
-* `-id` (short for *include directory*): Input directory to include. Can be repeated. This is to support rendering from multiple processors.
-
-* `-cd` (short for *consume directory*): Like `-id` except that the files are deleted as they are processed.
+* `-i` (short for *input directory*): Input directory to include. Can be repeated. This is to support rendering from multiple processors.
 
 * `-l` The x-coordinate of the left-most pixels to be processed. These pixels will be the left edge of the image file. Pixels with lower values will be ignored. Defaults to `0`.
 
