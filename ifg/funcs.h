@@ -7,7 +7,8 @@
 #define FUNCS_H
 
 #include <stdbool.h>
+#include <stdio.h>
 
 bool ParseCommandLine(int, char**);
-
+void ProcessImageFragmentFile(FILE*);
 #endif

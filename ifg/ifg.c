@@ -4,6 +4,9 @@
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include "Buffer.h"
+#include "ImageFragment.h"
 #include "funcs.h"
 #include "Pixel.h"
 
@@ -54,4 +57,22 @@ int main(int argc, char** argv)
 	FreePixels();
 
 	return 0;
+}
+
+void ProcessImageFragmentFile(FILE* file)
+{
+	struct Buffer buffer;
+	
+	InitBuffer(&buffer);
+
+	while(true)
+	{
+		struct ImageFragment* fragment;
+
+		fragment = ParseImageFragment(file);
+
+		if (NULL == fragment) break;
+	}
+
+	ReleaseBuffer(&buffer);
 }
