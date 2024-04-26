@@ -7,6 +7,7 @@
 #define PIXEL_H
 
 #include <stdio.h>
+#include "ImageFragment.h"
 #include "Subpixel.h"
 
 struct Pixel
@@ -17,6 +18,7 @@ struct Pixel
 	struct Subpixel* subpixels;
 };
 
+void AddFragmentToPixel(struct ImageFragment*);
 void SetUpPixels();
 void ProcessImageFragmentFile(FILE*);
 void OutputRow();

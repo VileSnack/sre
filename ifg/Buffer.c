@@ -10,7 +10,7 @@
 
 #define DEFAULT_BUFFER_LENGTH 16
 
-void AppendCharToBuffer(struct Buffer* buffer, char c)
+void AppendCharToBuffer(struct Buffer* buffer, const char c)
 {
 	if (NULL == buffer) return;
 	
@@ -84,11 +84,34 @@ bool IsBufferEmpty(struct Buffer* buffer)
 	return (0 == buffer->end);
 }
 
+void ParseUntilCharacter(struct Buffer* buffer, FILE* file, const char delimiter)
+{
+	int inChar;
+
+	if (NULL == buffer)
+	{
+		fprintf(stderr, "***** Error: NULL value passed to ParseUntilCharacter() as Buffer object pointer.\n");
+		return;
+	}
+
+	do
+	{
+		inChar = getc(file);
+
+		if (EOF == inChar) inChar = delimiter;
+
+		AppendCharToBuffer(buffer, (char)inChar);
+	}
+	while ((char)inChar != delimiter);
+}
+
 void ReleaseBuffer(struct Buffer* buffer)
 {
 	if (NULL != buffer)
 	{
 		free(buffer->data);
+		buffer->data = NULL;
+		buffer->reserved = buffer->end = 0;
 	}
 }
 
