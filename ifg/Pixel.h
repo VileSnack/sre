@@ -6,6 +6,7 @@
 #ifndef PIXEL_H
 #define PIXEL_H
 
+#include <stdbool.h>
 #include <stdio.h>
 #include "ImageFragment.h"
 #include "Subpixel.h"
@@ -19,7 +20,7 @@ struct Pixel
 };
 
 void AddFragmentToPixel(struct ImageFragment*);
-void SetUpPixels();
+bool SetUpPixels();
 void ProcessImageFragmentFile(FILE*);
 void OutputRow();
 void FreePixels();
