@@ -19,10 +19,14 @@ struct Pixel
 	struct Subpixel* subpixels;
 };
 
-void AddFragmentToPixel(struct ImageFragment*);
-bool SetUpPixels();
+bool CreatePixels();
+void DestroyPixels();
+
+bool InitializePixel(struct Pixel*);
+void FinalizePixel(struct Pixel*);
+
 void ProcessImageFragmentFile(FILE*);
+void AddFragmentToPixel(struct ImageFragment*);
 void OutputRow();
-void FreePixels();
 
 #endif
